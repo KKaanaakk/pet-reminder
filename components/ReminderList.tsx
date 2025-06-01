@@ -17,8 +17,12 @@ const ReminderList: React.FC<ReminderListProps> = ({
   onEdit,
   onDelete,
 }) => {
-  const pendingReminders = reminders.filter((r) => r.status === "pending");
-  const completedReminders = reminders.filter((r) => r.status === "completed");
+  const pendingReminders = Array.isArray(reminders)
+    ? reminders.filter((r) => r.status === "pending")
+    : [];
+  const completedReminders = Array.isArray(reminders)
+    ? reminders.filter((r) => r.status === "completed")
+    : [];
   const groupedPendingReminders = groupRemindersByTimeSlot(pendingReminders);
 
   const ReminderCard = ({ reminder }: { reminder: Reminder }) => (
@@ -91,29 +95,34 @@ const ReminderList: React.FC<ReminderListProps> = ({
         <h2 className="text-gray-500 text-sm font-medium mb-3">
           pending goals
         </h2>
-        {timeSlots.map((slot) => {
-          const slotReminders =
-            groupedPendingReminders[slot.label.toLowerCase()] || [];
-          if (slotReminders.length === 0) return null;
+        {Array.isArray(timeSlots) &&
+          timeSlots.map((slot) => {
+            const slotReminders = Array.isArray(
+              groupedPendingReminders[slot.label.toLowerCase()]
+            )
+              ? groupedPendingReminders[slot.label.toLowerCase()]
+              : [];
+            if (slotReminders.length === 0) return null;
 
-          return (
-            <div key={slot.label} className="mb-6">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-lg">{slot.icon}</span>
-                <h3 className="text-gray-600 text-sm font-medium">
-                  {slot.label.toLowerCase()}
-                </h3>
-                <div className="flex-1 h-px bg-gray-200"></div>
-                <Filter className="w-4 h-4 text-gray-400" />
+            return (
+              <div key={slot.label} className="mb-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-lg">{slot.icon}</span>
+                  <h3 className="text-gray-600 text-sm font-medium">
+                    {slot.label.toLowerCase()}
+                  </h3>
+                  <div className="flex-1 h-px bg-gray-200"></div>
+                  <Filter className="w-4 h-4 text-gray-400" />
+                </div>
+                <div className="space-y-3">
+                  {Array.isArray(slotReminders) &&
+                    slotReminders.map((reminder) => (
+                      <ReminderCard key={reminder.id} reminder={reminder} />
+                    ))}
+                </div>
               </div>
-              <div className="space-y-3">
-                {slotReminders.map((reminder) => (
-                  <ReminderCard key={reminder.id} reminder={reminder} />
-                ))}
-              </div>
-            </div>
-          );
-        })}
+            );
+          })}
       </div>
 
       {/* Completed Goals Section */}
@@ -123,9 +132,10 @@ const ReminderList: React.FC<ReminderListProps> = ({
             completed goals
           </h2>
           <div className="space-y-3">
-            {completedReminders.map((reminder) => (
-              <ReminderCard key={reminder.id} reminder={reminder} />
-            ))}
+            {Array.isArray(completedReminders) &&
+              completedReminders.map((reminder) => (
+                <ReminderCard key={reminder.id} reminder={reminder} />
+              ))}
           </div>
         </div>
       )}

@@ -32,6 +32,17 @@ export default function ReminderForm({
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [showSettings, setShowSettings] = useState(true);
 
+  const defaultPets = [
+    { id: "browney", name: "Browney" },
+    { id: "max", name: "Max" },
+    { id: "luna", name: "Luna" },
+    { id: "shera", name: "Shera" },
+    { id: "chango", name: "Chango" },
+  ];
+
+  const petOptions =
+    Array.isArray(pets) && pets.length > 0 ? pets : defaultPets;
+
   useEffect(() => {
     if (reminder) {
       setFormData({
@@ -124,7 +135,7 @@ export default function ReminderForm({
                 }`}
               >
                 <option value="">Choose pet</option>
-                {pets.map((pet) => (
+                {petOptions.map((pet) => (
                   <option key={pet.id} value={pet.id}>
                     🐕 {pet.name}
                   </option>

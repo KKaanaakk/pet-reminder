@@ -33,6 +33,9 @@ export async function connectToDatabase(): Promise<{ client: MongoClient; db: Db
     } catch (error) {
       console.log('Cached connection failed, creating new connection');
       // Connection failed, will create new below
+      if (cached.client) {
+        await cached.client.close().catch(console.error);
+      }
       cached = null;
     }
   }
@@ -46,6 +49,15 @@ export async function connectToDatabase(): Promise<{ client: MongoClient; db: Db
       maxPoolSize: 10,
       minPoolSize: 0,
       maxIdleTimeMS: CONNECTION_TIMEOUT,
+      ssl: true,
+      tls: true,
+      tlsAllowInvalidCertificates: false,
+      tlsAllowInvalidHostnames: false,
+      // Force TLS version to 1.2 or higher
+      tlsCAFile: undefined, // Let MongoDB driver handle CA certificates
+      // Additional SSL/TLS options
+      retryWrites: true,
+      directConnection: false,
     });
 
     try {

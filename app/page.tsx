@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Pet, Reminder, ReminderFormData } from "@/lib/types";
 import Calendar from "@/components/Calendar";
 import ReminderForm from "@/components/ReminderForm";
@@ -19,23 +19,7 @@ export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [isLoading, setIsLoading] = useState(false);
 
-  // Fetch pets and reminders
-  useEffect(() => {
-    fetchPets();
-    fetchReminders();
-  }, [selectedDate, selectedPet, selectedCategory]);
-
-  const fetchPets = async () => {
-    try {
-      const response = await fetch("/api/pets");
-      const data = await response.json();
-      setPets(data);
-    } catch (error) {
-      console.error("Error fetching pets:", error);
-    }
-  };
-
-  const fetchReminders = async () => {
+  const fetchReminders = useCallback(async () => {
     try {
       const params = new URLSearchParams({
         date: selectedDate.toISOString().split("T")[0],
@@ -50,6 +34,22 @@ export default function Home() {
       setReminders(data);
     } catch (error) {
       console.error("Error fetching reminders:", error);
+    }
+  }, [selectedDate, selectedPet, selectedCategory]);
+
+  // Fetch pets and reminders
+  useEffect(() => {
+    fetchPets();
+    fetchReminders();
+  }, [fetchReminders]);
+
+  const fetchPets = async () => {
+    try {
+      const response = await fetch("/api/pets");
+      const data = await response.json();
+      setPets(data);
+    } catch (error) {
+      console.error("Error fetching pets:", error);
     }
   };
 

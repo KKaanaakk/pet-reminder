@@ -30,7 +30,7 @@ export async function connectToDatabase(): Promise<{ client: MongoClient; db: Db
       await cached.db.command({ ping: 1 });
       cached.lastUsed = Date.now();
       return cached;
-    } catch (error) {
+    } catch (_) {
       console.log('Cached connection failed, creating new connection');
       // Connection failed, will create new below
       if (cached.client) {
